@@ -95,8 +95,26 @@ def data_preprocess(args):
 
     return data_list, target_list
 
+def _data_preprocess(args):
+    if args.ent:
+        diagrams = feature_extraction()[0]
+    else:
+        diagrams = np.load('./data/diagrams.npy')
+    cast = pd.read_table('./data/SCOP40mini_sequence_minidatabase_19.cast')
+    cast.columns.values[0] = 'protein'
+
+    ## todo: Try another way to load data (just not use isin and label_binarize)
+
+    data_list = []
+    target_list = []
+
+    return data_list, target_list
+
 def main(args):
-    data_list, target_list = data_preprocess(args)
+    if args.d == 0:
+        data_list, target_list = data_preprocess(args)
+    else:
+        data_list, target_list = _data_preprocess(args)
 
     task_acc_train = []
     task_acc_test = []
@@ -140,6 +158,7 @@ if __name__ == "__main__":
     parser.add_argument('--model_type', type=str, default='svm', choices=['svm', 'linear_svm', 'lr'], help="Model type")
     parser.add_argument('--kernel', type=str, default='rbf', choices=['linear', 'poly', 'rbf', 'sigmoid'], help="Kernel type")
     parser.add_argument('--C', type=float, default=20, help="Regularization parameter")
-    parser.add_argument('--ent', action='store_true', help="Load data from file")
+    parser.add_argument('--ent', action='store_true', help="Load data from a file using a feature engineering function feature_extraction() from fea.py")
+    parser.add_argument('--d', type=int, choices=[0, 1], default=0, help='A flag to choose the data reading method. Default is 0.')
     args = parser.parse_args()
     main(args)
