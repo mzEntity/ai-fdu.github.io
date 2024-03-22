@@ -62,7 +62,6 @@ class LinearSVMModel:
 
 
 def data_preprocess(args):
-    # Load data
     if args.ent:
         diagrams = feature_extraction()[0]
     else:
@@ -72,49 +71,19 @@ def data_preprocess(args):
 
     data_list = []
     target_list = []
-
     for task in range(1, 56):  # Assuming only one task for now
         task_col = cast.iloc[:, task]
-
-        # Partition training sets
-        train_set = task_col.isin([1, 2])
-        # Generate training targets
-        train_targets_all = np.ravel(label_binarize(task_col, classes=[1]))
-        train_targets = train_targets_all[train_set]
-        # Partition diagrams
-        train_data = diagrams[train_set]
-
-        # todo: Create test data by complementing the train data, pay attention to the reading position of test data
-        test_set = train_set
-        test_targets_all = train_targets_all
-        test_targets = train_targets
-        test_data = train_data
-
+      
+        ## todo: Try to load data/target
+        
         data_list.append((train_data, test_data))
         target_list.append((train_targets, test_targets))
-
-    return data_list, target_list
-
-def data_preprocess_(args):
-    if args.ent:
-        diagrams = feature_extraction()[0]
-    else:
-        diagrams = np.load('./data/diagrams.npy')
-    cast = pd.read_table('./data/SCOP40mini_sequence_minidatabase_19.cast')
-    cast.columns.values[0] = 'protein'
-
-    ## todo: Try another way to load data (just not use isin and label_binarize)
-
-    data_list = []
-    target_list = []
-
+    
     return data_list, target_list
 
 def main(args):
-    if args.d == 0:
-        data_list, target_list = data_preprocess(args)
-    else:
-        data_list, target_list = data_preprocess_(args)
+
+    data_list, target_list = data_preprocess(args)
 
     task_acc_train = []
     task_acc_test = []
@@ -159,6 +128,5 @@ if __name__ == "__main__":
     parser.add_argument('--kernel', type=str, default='rbf', choices=['linear', 'poly', 'rbf', 'sigmoid'], help="Kernel type")
     parser.add_argument('--C', type=float, default=20, help="Regularization parameter")
     parser.add_argument('--ent', action='store_true', help="Load data from a file using a feature engineering function feature_extraction() from fea.py")
-    parser.add_argument('--d', type=int, choices=[0, 1], default=0, help='A flag to choose the data reading method. Default is 0.')
     args = parser.parse_args()
     main(args)

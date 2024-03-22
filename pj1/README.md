@@ -35,9 +35,6 @@ pip install numpy pandas scikit-learn biopython
 3. **Test Data Generation:**
 - Complete the generation of test data by complementing the train data. Ensure correct reading positions for test data.
 
-4. **Rewrite Data Preprocess:**
-- Train another way to load data (just not use isin and label_binarize) and implementation data_preprocess_ functions code.
-
 ### Running the Script:
 - Execute the script `main.py` from the command line.
 - You can provide arguments to customize the model type, kernel type, regularization parameter, and data loading method.
@@ -51,7 +48,6 @@ python main.py --model_type svm --kernel rbf --C 1.0
 
 1. **Complete Implementation of Protein Classification (Data Loading) - 4 points**
     - Ensure the code effectively reads and preprocesses protein structure data and sequences.
-    - Both functions should work fine.
 
 2. **Comparison of Linear SVM with Other Machine Learning Methods (e.g., LR) - 2 points**
     - Implement Linear SVM model and LR model.
