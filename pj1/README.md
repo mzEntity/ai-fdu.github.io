@@ -36,7 +36,7 @@ pip install numpy pandas scikit-learn biopython
 - Complete the generation of test data by complementing the train data. Ensure correct reading positions for test data.
 
 4. **Rewrite Data Preprocess:**
-- Train another way to load data (just not use isin and label_binarize) and implementation _data_preprocess functions code.
+- Train another way to load data (just not use isin and label_binarize) and implementation data_preprocess_ functions code.
 
 ### Running the Script:
 - Execute the script `main.py` from the command line.

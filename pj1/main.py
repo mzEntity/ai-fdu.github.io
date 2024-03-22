@@ -95,7 +95,7 @@ def data_preprocess(args):
 
     return data_list, target_list
 
-def _data_preprocess(args):
+def data_preprocess_(args):
     if args.ent:
         diagrams = feature_extraction()[0]
     else:
@@ -114,7 +114,7 @@ def main(args):
     if args.d == 0:
         data_list, target_list = data_preprocess(args)
     else:
-        data_list, target_list = _data_preprocess(args)
+        data_list, target_list = data_preprocess_(args)
 
     task_acc_train = []
     task_acc_test = []
