@@ -11,7 +11,7 @@ from PIL import Image
 import h5py
 import cv2
 import shutil
-from model import CSRNet, Vit4R
+from model import CSRNet
 
 
 def save_checkpoint(state, is_best, task_id, filename='checkpoint.pth.tar', save_dir='./model/'):  # 添加保存目录参数
@@ -33,13 +33,12 @@ def load_data(img_path, gt_path, train=True):
 
 
 class ImgDataset(Dataset):
-    def __init__(self, img_dir, gt_dir, shape=None, shuffle=True, transform=None, train=False, seen=0, batch_size=1, num_workers=4):
+    def __init__(self, img_dir, gt_dir, shape=None, shuffle=True, transform=None, train=False, batch_size=1, num_workers=4):
         self.img_dir = img_dir
         self.gt_dir = gt_dir
         self.transform = transform
         self.train = train
         self.shape = shape
-        self.seen = seen
         self.batch_size = batch_size
         self.num_workers = num_workers
 
@@ -66,9 +65,9 @@ class ImgDataset(Dataset):
         return img, target
 
 
-original_lr = 1e-7
-lr = 1e-7
-batch_size = 8
+lr = 1e-8
+original_lr = lr
+batch_size = 64
 momentum = 0.95
 decay = 5*1e-4
 epochs = 40
@@ -90,7 +89,6 @@ def main():
     torch.cuda.manual_seed(seed)
 
     model = CSRNet()
-    model = Vit4R()
 
     model = model.cuda()
 
@@ -107,7 +105,7 @@ def main():
 
     dataset = ImgDataset(
         img_dir,
-        gt_dir, transform=transform, train=True, seen=model.seen)
+        gt_dir, transform=transform, train=True)
 
     train_size = int(0.8 * len(dataset))
     val_size = len(dataset) - train_size
@@ -168,9 +166,9 @@ def train(model, criterion, optimizer, epoch, train_loader):
         img = img.cuda()
         img = Variable(img)
         output = model(img)
-
         target = target.type(torch.FloatTensor).cuda()
         target = Variable(target)
+
         loss = criterion(output, target)
 
         losses.update(loss.item(), img.size(0))
