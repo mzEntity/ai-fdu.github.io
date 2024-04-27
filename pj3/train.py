@@ -67,7 +67,7 @@ class ImgDataset(Dataset):
 
 lr = 1e-8
 original_lr = lr
-batch_size = 64
+batch_size = 8
 momentum = 0.95
 decay = 5*1e-4
 epochs = 40

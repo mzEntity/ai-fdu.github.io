@@ -6,6 +6,7 @@ from torchvision import models
 class CSRNet(nn.Module):
     def __init__(self, load_weights=False):
         super(CSRNet, self).__init__()
+        self.seen = 0
         self.frontend_feat = [64, 64, 'M', 128, 128,
                               'M', 256, 256, 256, 'M', 512, 512, 512]
         self.backend_feat = [512, 512, 512, 256, 128, 64]
@@ -24,7 +25,7 @@ class CSRNet(nn.Module):
         x = self.frontend(x)
         x = self.backend(x)
         x = self.output_layer(x)
-        x = x.permute(0, 3, 2, 1).squeeze()
+        x = torch.squeeze(x, dim=1)
         return x
 
     def _initialize_weights(self):
