@@ -1,5 +1,5 @@
-import torch
 import torch.nn as nn
+import torch
 from torchvision import models
 
 
@@ -25,7 +25,6 @@ class CSRNet(nn.Module):
         x = self.frontend(x)
         x = self.backend(x)
         x = self.output_layer(x)
-        x = torch.squeeze(x, dim=1)
         return x
 
     def _initialize_weights(self):

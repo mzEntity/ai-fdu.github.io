@@ -65,12 +65,12 @@ class ImgDataset(Dataset):
         return img, target
 
 
-lr = 1e-8
+lr = 1e-7
 original_lr = lr
-batch_size = 8
+batch_size = 1
 momentum = 0.95
 decay = 5*1e-4
-epochs = 40
+epochs = 400
 steps = [-1, 1, 100, 150]
 scales = [1, 1, 1, 1]
 workers = 4
@@ -166,9 +166,8 @@ def train(model, criterion, optimizer, epoch, train_loader):
         img = img.cuda()
         img = Variable(img)
         output = model(img)
-        target = target.type(torch.FloatTensor).cuda()
+        target = target.type(torch.FloatTensor).unsqueeze(1).cuda()
         target = Variable(target)
-
         loss = criterion(output, target)
 
         losses.update(loss.item(), img.size(0))
