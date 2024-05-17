@@ -133,9 +133,7 @@ def main():
                              0.229, 0.224, 0.225]),
     ])
 
-    dataset = ImgDataset(
-        img_dir,
-        gt_dir, transform=transform, train=True)
+    dataset = ImgDataset(img_dir, gt_dir, transform=transform)
 
     train_size = int(0.8 * len(dataset))
     val_size = len(dataset) - train_size
