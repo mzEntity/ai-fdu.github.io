@@ -192,12 +192,10 @@ def train(model, criterion, optimizer, epoch, train_loader):
         data_time.update(time.time() - end)
         
         if type(img) == list:
-            img[0] = img[0].to(device)
-            img[1] = img[1].to(device)
+            img[0] = Variable(img[0].to(device))
+            img[1] = Variable(img[1].to(device))
         else:
-            img = img.to(device)
-        
-        img = Variable(img)
+            img = Variable(img.to(device))
         
         count, output, output_normed = model(img)
         target = target.type(torch.FloatTensor).unsqueeze(1).to(device)
@@ -229,10 +227,9 @@ def validate(model, val_loader):
     mae = 0
 
     for i, (img, target) in enumerate(val_loader):
-        img[0] = img[0].to(device)
-        img[1] = img[1].to(device)
+        img[0] = Variable(img[0].to(device))
+        img[1] = Variable(img[1].to(device))
         
-        img = Variable(img)
         count, output, output_normed = model(img)
 
         mae += abs(output.data.sum() -

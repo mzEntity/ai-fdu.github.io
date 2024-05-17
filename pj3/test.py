@@ -79,8 +79,8 @@ with torch.no_grad():  # 关闭梯度计算，节省内存和计算资源
         print(i)
         if i > 2:
             break
-        img_RGB = img_RGB.to(device)
-        img_Thermal = img_Thermal.to(device)
+        img_RGB = Variable(img_RGB.to(device))
+        img_Thermal = Variable(img_Thermal.to(device))
         file_number = int(file_number)
         count, output, output_normed = model([img_RGB, img_Thermal]) 
         ans = output.detach().cpu().sum()  
