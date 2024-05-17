@@ -4,7 +4,7 @@ import numpy as np
 from timm.models.layers import DropPath
 from timm.models.layers import trunc_normal_
 from thop import profile, clever_format
-from models.ops.modules import MSDeformAttn
+from ..models.ops.modules import MSDeformAttn
 
 class Mlp(nn.Module):
     def __init__(self, in_features, hidden_features=None, out_features=None, act_layer=nn.GELU, drop=0.):

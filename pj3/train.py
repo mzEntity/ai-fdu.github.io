@@ -11,7 +11,7 @@ import h5py
 import cv2
 import shutil
 # from model import CSRNet
-from nets.RGBTCCNet import ThermalRGBNet
+from .nets.RGBTCCNet import ThermalRGBNet
 
 def load_RGB_or_Thermal(img_path):
     img = Image.open(img_path).convert('RGB')
