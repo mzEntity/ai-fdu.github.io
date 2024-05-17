@@ -1,7 +1,6 @@
 import os
 import torch
 import torch.nn as nn
-from torch.autograd import Variable
 from torchvision import transforms
 import time
 import random
@@ -191,15 +190,11 @@ def train(model, criterion, optimizer, epoch, train_loader):
     for i, (img, target) in enumerate(train_loader):
         data_time.update(time.time() - end)
         
-        if type(img) == list:
-            img[0] = Variable(img[0].to(device))
-            img[1] = Variable(img[1].to(device))
-        else:
-            img = Variable(img.to(device))
+        img[0] = img[0].to(device)
+        img[1] = img[1].to(device)
         
         count, output, output_normed = model(img)
         target = target.type(torch.FloatTensor).unsqueeze(1).to(device)
-        target = Variable(target)
         loss = criterion(output, target)
 
         losses.update(loss.item(), img.size(0))
@@ -227,8 +222,8 @@ def validate(model, val_loader):
     mae = 0
 
     for i, (img, target) in enumerate(val_loader):
-        img[0] = Variable(img[0].to(device))
-        img[1] = Variable(img[1].to(device))
+        img[0] = img[0].to(device)
+        img[1] = img[1].to(device)
         
         count, output, output_normed = model(img)
 
