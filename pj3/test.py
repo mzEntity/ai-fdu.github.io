@@ -10,58 +10,12 @@ from torchvision import transforms
 from torch.utils.data import Dataset, DataLoader
 from PIL import Image
 
-
-def load_RGB_or_Thermal(img_path):
-    img = Image.open(img_path).convert('RGB').resize((224, 224))
-    return img
-
-class ImgDataset(Dataset):
-    def __init__(self, img_dir, batch_size=1):
-        self.transform = transforms.Compose([
-            transforms.ToTensor(),
-            transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[
-                                0.229, 0.224, 0.225]),
-        ])
-        self.img_dir = img_dir
-        self.batch_size = batch_size
-
-        self.rgb_img_paths = [os.path.join(img_dir, filename) for filename in os.listdir(
-            img_dir) if filename.endswith('.jpg')]
-        
-        # 转换为对应的 Thermal 图像路径
-        self.thermal_img_paths = [
-            path.replace('rgb/', 'tir/').replace('.jpg', 'R.jpg')
-            for path in self.rgb_img_paths
-        ]
-
-        self.img_paths = list(zip(self.rgb_img_paths, self.thermal_img_paths))
-
-        self.nSamples = len(self.img_paths)
-
-    def __len__(self):
-        return self.nSamples
-
-    def __getitem__(self, index):
-        rgb_img_path,thermal_img_path = self.img_paths[index]
-        img_RGB = load_RGB_or_Thermal(rgb_img_path)
-        img_Thermal = load_RGB_or_Thermal(thermal_img_path)
-
-        if self.transform is not None:
-            img_RGB = self.transform(img_RGB)
-            img_Thermal = self.transform(img_Thermal)    
-        
-        parts = rgb_img_path.split('/')
-        # 获取文件名部分（即最后一部分）
-        filename = parts[-1]
-        # 再次使用split()分割以去掉扩展名
-        file_number = filename.split('.')[0]
-
-        return [img_RGB, img_Thermal, int(file_number)]
+from datasets.testCrowd import TestCrowd
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-img_dir = './dataset/test/rgb/'
+
 batch_size = 1
-test_dataset = ImgDataset(img_dir=img_dir,batch_size=batch_size)
+test_dataset = TestCrowd(batch_size=batch_size)
 test_loader = DataLoader(test_dataset, batch_size=batch_size, shuffle=False)
 
 model = ThermalRGBNet()
