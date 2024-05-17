@@ -132,7 +132,7 @@ def train(model, criterion, optimizer, epoch, train_loader):
             
         loss = criterion(output, target)
 
-        losses.update(loss.item(), img.size(0))
+        losses.update(loss.item(), img[0].size(0))
         optimizer.zero_grad()
         loss.backward()
         optimizer.step()
