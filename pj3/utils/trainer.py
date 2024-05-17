@@ -1,7 +1,7 @@
 import os
 import logging
 from datetime import datetime
-from .logger import setlogger
+from utils.logger import setlogger
 
 
 class Trainer(object):

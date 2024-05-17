@@ -1,6 +1,6 @@
 import torch
 from torch.nn import Module
-from .bregman_pytorch import sinkhorn
+from losses.bregman_pytorch import sinkhorn
 
 class OT_Loss(Module):
     def __init__(self, c_size, stride, norm_cood, device, num_of_iter_in_ot=100, reg=10.0):

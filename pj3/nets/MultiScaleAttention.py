@@ -1,4 +1,4 @@
-from .transformer_decoder_noPos import SingleAttention
+from nets.transformer_decoder_noPos import SingleAttention
 import torch
 import torch.nn as nn
 from timm.models.layers import DropPath

@@ -1,6 +1,6 @@
-from .evaluation import eval_game, eval_relative
-from .trainer import Trainer
-from .helper import Save_Handle, AverageMeter
+from utils.evaluation import eval_game, eval_relative
+from utils.trainer import Trainer
+from utils.helper import Save_Handle, AverageMeter
 import os
 import sys
 import time

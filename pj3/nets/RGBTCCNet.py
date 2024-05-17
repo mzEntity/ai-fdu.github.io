@@ -1,9 +1,9 @@
 import torch
 import torch.nn as nn
-from .pvt_v2 import pvt_v2_b3
-from .transformer_decoder_noPos import transfmrerDecoder
+from nets.pvt_v2 import pvt_v2_b3
+from nets.transformer_decoder_noPos import transfmrerDecoder
 from thop import profile, clever_format
-from .MultiScaleAttention import MultiScaleAttention
+from nets.MultiScaleAttention import MultiScaleAttention
 
 
 class ThermalRGBNet(nn.Module):

@@ -1,6 +1,6 @@
 import torch.nn as nn
 from timm.models.layers import DropPath
-from .transformer_block import Mlp
+from nets.transformer_block import Mlp
 
 
 class Attention(nn.Module):
