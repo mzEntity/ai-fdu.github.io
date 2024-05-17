@@ -21,11 +21,11 @@ def save_checkpoint(state, is_best, task_id, filename='checkpoint.pth.tar', save
             save_dir, task_id + 'model_best.pth.tar')
         shutil.copyfile(checkpoint_path, best_model_path)
     
-lr = 1e-7
+lr = 1e-5
 original_lr = lr
 batch_size = 1
 momentum = 0.95
-decay = 5*1e-4
+decay = 1*1e-4
 epochs = 400
 steps = [-1, 1, 100, 150]
 scales = [1, 1, 1, 1]
