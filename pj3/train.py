@@ -191,11 +191,11 @@ def train(model, criterion, optimizer, epoch, train_loader):
     for i, (img, target) in enumerate(train_loader):
         data_time.update(time.time() - end)
         
-        if type(inputs) == list:
+        if type(img) == list:
             img[0] = img[0].to(device)
             img[1] = img[1].to(device)
         else:
-            inputs = inputs.to(device)
+            img = img.to(device)
         
         img = Variable(img)
         
