@@ -71,7 +71,7 @@ class ThermalRGBNet(nn.Module):
         rgb_fea1_16 = self.mlp1_16(rgb_fea1_16)
 
         count_token = self.count_token.expand(B, -1, -1)
-        print(f"rgb: {rgb_fea1_32.shape}, ther: {thermal_fea1_32.shape}, token: {count_token.shape}")
+        # print(f"rgb: {rgb_fea1_32.shape}, ther: {thermal_fea1_32.shape}, token: {count_token.shape}")
         out_fea = self.MSA(rgb_fea1_32, thermal_fea1_32, count_token)
         rgb_fea1_32 = out_fea[:, 0:N, :]
         t_token = out_fea[:, N:, :]
