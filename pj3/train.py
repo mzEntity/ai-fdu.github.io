@@ -14,6 +14,16 @@ import shutil
 # from model import CSRNet
 from nets.RGBTCCNet import ThermalRGBNet
 
+def load_RGB_or_Thermal(img_path):
+    img = Image.open(img_path).convert('RGB')
+    return img
+
+def load_Target(gt_path):
+    gt_file = h5py.File(gt_path)
+    target = np.asarray(gt_file['density'])
+    target = cv2.resize(
+        target, (target.shape[1]//8, target.shape[0]//8), interpolation=cv2.INTER_CUBIC)*64
+    return target
 
 def save_checkpoint(state, is_best, task_id, filename='checkpoint.pth.tar', save_dir='./model/'):  # 添加保存目录参数
     checkpoint_path = os.path.join(save_dir, task_id + filename)
@@ -31,20 +41,26 @@ def load_data(img_path, gt_path, train=True):
     target = cv2.resize(
         target, (target.shape[1]//8, target.shape[0]//8), interpolation=cv2.INTER_CUBIC)*64
     return img, target
-
-
+    
 class ImgDataset(Dataset):
-    def __init__(self, img_dir, gt_dir, shape=None, shuffle=True, transform=None, train=False, batch_size=1, num_workers=4):
+    def __init__(self, img_dir, gt_dir, shape=None, shuffle=True, transform=None, batch_size=1, num_workers=4):
         self.img_dir = img_dir
         self.gt_dir = gt_dir
         self.transform = transform
-        self.train = train
         self.shape = shape
         self.batch_size = batch_size
         self.num_workers = num_workers
 
-        self.img_paths = [os.path.join(img_dir, filename) for filename in os.listdir(
+        self.rgb_img_paths = [os.path.join(img_dir, filename) for filename in os.listdir(
             img_dir) if filename.endswith('.jpg')]
+        
+        # 转换为对应的 Thermal 图像路径
+        self.thermal_img_paths = [
+            path.replace('rgb/', 'tir/').replace('.jpg', 'R.jpg')
+            for path in self.rgb_img_paths
+        ]
+
+        self.img_paths = list(zip(self.rgb_img_paths, self.thermal_img_paths))
 
         if shuffle:
             random.shuffle(self.img_paths)
@@ -55,15 +71,19 @@ class ImgDataset(Dataset):
         return self.nSamples
 
     def __getitem__(self, index):
-        assert index <= len(self), 'index range error'
-        img_path = self.img_paths[index]
-        img_name = os.path.basename(img_path)
-        gt_path = os.path.join(
-            self.gt_dir, os.path.splitext(img_name)[0] + '.h5')
-        img, target = load_data(img_path, gt_path, self.train)
+        rgb_img_path,thermal_img_path = self.img_paths[index]
+        img_RGB = load_RGB_or_Thermal(rgb_img_path)
+        img_Thermal = load_RGB_or_Thermal(thermal_img_path)
+
+        img_name = os.path.basename(rgb_img_path)
+        gt_path = os.path.join(self.gt_dir, os.path.splitext(img_name)[0] + '.h5')
+        target = load_Target(gt_path)
+
         if self.transform is not None:
-            img = self.transform(img)
-        return img, target
+            img_RGB = self.transform(img_RGB)
+            img_Thermal = self.transform(img_Thermal)    
+
+        return [img_RGB, img_Thermal], target
 
 
 lr = 1e-7
@@ -81,19 +101,28 @@ img_dir = "./dataset/train/rgb/"
 gt_dir = "./dataset/train/hdf5s/"
 pre = None
 task = ""
+device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 
+def set_seed(seed):
+    torch.manual_seed(seed)
+    if torch.cuda.is_available():
+        torch.cuda.manual_seed_all(seed)
+    import numpy as np
+    np.random.seed(seed)
+    import random
+    random.seed(seed)
+set_seed(42)
+    
 def main():
     start_epoch = 0
     best_prec1 = 1e6
 
-    torch.cuda.manual_seed(seed)
-
     model = ThermalRGBNet()
 
-    model = model.cuda()
+    model = model.to(device)
 
-    criterion = nn.MSELoss(size_average=False).cuda()
+    criterion = nn.MSELoss(size_average=False).to(device)
 
     optimizer = torch.optim.SGD(model.parameters(), lr,
                                 momentum=momentum,
@@ -163,11 +192,17 @@ def train(model, criterion, optimizer, epoch, train_loader):
 
     for i, (img, target) in enumerate(train_loader):
         data_time.update(time.time() - end)
-
-        img = img.cuda()
+        
+        if type(inputs) == list:
+            img[0] = img[0].to(device)
+            img[1] = img[1].to(device)
+        else:
+            inputs = inputs.to(device)
+        
         img = Variable(img)
-        output = model(img)
-        target = target.type(torch.FloatTensor).unsqueeze(1).cuda()
+        
+        count, output, output_normed = model(img)
+        target = target.type(torch.FloatTensor).unsqueeze(1).to(device)
         target = Variable(target)
         loss = criterion(output, target)
 
@@ -196,12 +231,14 @@ def validate(model, val_loader):
     mae = 0
 
     for i, (img, target) in enumerate(val_loader):
-        img = img.cuda()
+        img[0] = img[0].to(device)
+        img[1] = img[1].to(device)
+        
         img = Variable(img)
-        output = model(img)
+        count, output, output_normed = model(img)
 
         mae += abs(output.data.sum() -
-                   target.sum().type(torch.FloatTensor).cuda())
+                   target.sum().type(torch.FloatTensor).to(device))
 
     mae = mae/len(val_loader)
     print(' * MAE {mae:.3f} '
