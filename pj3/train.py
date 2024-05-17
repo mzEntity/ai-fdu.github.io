@@ -64,10 +64,10 @@ class ImgDataset(Dataset):
         rgb_img_path,thermal_img_path = self.img_paths[index]
         img_RGB = load_RGB_or_Thermal(rgb_img_path)
         img_Thermal = load_RGB_or_Thermal(thermal_img_path)
-
+        # can optimize
         img_name = os.path.basename(rgb_img_path)
         gt_path = os.path.join(self.gt_dir, os.path.splitext(img_name)[0] + '.h5')
-        target = load_Target(gt_path)
+        target = load_Target(gt_path).resize((224, 224))
 
         if self.transform is not None:
             img_RGB = self.transform(img_RGB)
