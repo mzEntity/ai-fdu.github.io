@@ -71,6 +71,7 @@ class ThermalRGBNet(nn.Module):
         rgb_fea1_16 = self.mlp1_16(rgb_fea1_16)
 
         count_token = self.count_token.expand(B, -1, -1)
+        print(f"rgb: {rgb_fea1_32.shape}, ther: {thermal_fea1_32.shape}, token: {count_token.shape}")
         out_fea = self.MSA(rgb_fea1_32, thermal_fea1_32, count_token)
         rgb_fea1_32 = out_fea[:, 0:N, :]
         t_token = out_fea[:, N:, :]
@@ -101,7 +102,7 @@ if __name__ == '__main__':
     #                     default=r'', type=str,
     #                     help='load Pretrained model')
     args = parser.parse_args()
-    a = torch.randn(1, 3, 224, 224)
+    a = torch.randn(1, 3, 512, 640)
     model = ThermalRGBNet(None)
     flops, params = profile(model, ([a,a],))
     flops, params = clever_format([flops, params], "%.2f")
