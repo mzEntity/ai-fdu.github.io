@@ -14,7 +14,7 @@ import shutil
 from nets.RGBTCCNet import ThermalRGBNet
 
 def load_RGB_or_Thermal(img_path):
-    img = Image.open(img_path).convert('RGB')
+    img = Image.open(img_path).convert('RGB').resize((224, 224))
     return img
 
 def load_Target(gt_path):
@@ -31,15 +31,6 @@ def save_checkpoint(state, is_best, task_id, filename='checkpoint.pth.tar', save
         best_model_path = os.path.join(
             save_dir, task_id + 'model_best.pth.tar')
         shutil.copyfile(checkpoint_path, best_model_path)
-
-
-def load_data(img_path, gt_path, train=True):
-    img = Image.open(img_path).convert('RGB')
-    gt_file = h5py.File(gt_path)
-    target = np.asarray(gt_file['density'])
-    target = cv2.resize(
-        target, (target.shape[1]//8, target.shape[0]//8), interpolation=cv2.INTER_CUBIC)*64
-    return img, target
     
 class ImgDataset(Dataset):
     def __init__(self, img_dir, gt_dir, shape=None, shuffle=True, transform=None, batch_size=1, num_workers=4):

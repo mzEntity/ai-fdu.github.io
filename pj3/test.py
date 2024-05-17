@@ -12,7 +12,7 @@ from PIL import Image
 
 
 def load_RGB_or_Thermal(img_path):
-    img = Image.open(img_path).convert('RGB')
+    img = Image.open(img_path).convert('RGB').resize((224, 224))
     return img
 
 class ImgDataset(Dataset):
