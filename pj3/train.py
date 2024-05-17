@@ -11,7 +11,8 @@ from PIL import Image
 import h5py
 import cv2
 import shutil
-from model import CSRNet
+# from model import CSRNet
+from transcc.nets.RGBTCCNet import ThermalRGBNet
 
 
 def save_checkpoint(state, is_best, task_id, filename='checkpoint.pth.tar', save_dir='./model/'):  # 添加保存目录参数
@@ -88,7 +89,7 @@ def main():
 
     torch.cuda.manual_seed(seed)
 
-    model = CSRNet()
+    model = ThermalRGBNet()
 
     model = model.cuda()
 

@@ -1,14 +1,15 @@
 import PIL.Image as Image
 import torchvision.transforms.functional as F
 import torch
-from model import CSRNet
+# from model import CSRNet
+from transcc.nets.RGBTCCNet import ThermalRGBNet
 from torchvision import transforms
 from torch.autograd import Variable
 
 test_path = "./dataset/test/rgb/"
 img_paths = [f"{test_path}{i}.jpg" for i in range(1, 1001)]
 
-model = CSRNet()
+model = ThermalRGBNet()
 model = model.cuda()
 checkpoint = torch.load('./model/model_best.pth.tar')
 model.load_state_dict(checkpoint['state_dict'])
