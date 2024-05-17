@@ -8,6 +8,7 @@ from torch.utils.data import Dataset, DataLoader, random_split
 from PIL import Image
 import h5py
 import shutil
+import torch.nn.functional as F
 # from model import CSRNet
 from nets.RGBTCCNet import ThermalRGBNet
 from datasets.trainCrowd import TrainCrowd
@@ -125,6 +126,9 @@ def train(model, criterion, optimizer, epoch, train_loader):
         print(f"img0: {img[0].shape}, img1: {img[1].shape}")
         count, output, output_normed = model(img)
         target = target.type(torch.FloatTensor).unsqueeze(1).to(device)
+        
+        if output.shape != target.shape:
+            target = F.interpolate(target, size=(output.shape[2], output.shape[3]), mode='bilinear', align_corners=False)
             
         loss = criterion(output, target)
 
