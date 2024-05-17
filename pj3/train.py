@@ -128,7 +128,12 @@ def train(model, criterion, optimizer, epoch, train_loader):
         target = target.type(torch.FloatTensor).unsqueeze(1).to(device)
         
         if output.shape != target.shape:
-            target = F.interpolate(target, size=(output.shape[2], output.shape[3]), mode='bilinear', align_corners=False)
+            original_height, original_width = target.shape[2], target.shape[3]
+            target_height, target_width = output.shape[2], output.shape[3]
+            scale_factor = (original_height / target_height) * (original_width / target_width)
+
+            target = F.interpolate(target, size=(target_height, target_width), mode='bilinear', align_corners=False) * scale_factor
+
             
         loss = criterion(output, target)
 
