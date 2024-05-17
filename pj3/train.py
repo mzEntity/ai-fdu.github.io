@@ -125,6 +125,7 @@ def train(model, criterion, optimizer, epoch, train_loader):
         print(f"img0: {img[0].shape}, img1: {img[1].shape}")
         count, output, output_normed = model(img)
         target = target.type(torch.FloatTensor).unsqueeze(1).to(device)
+            
         loss = criterion(output, target)
 
         losses.update(loss.item(), img.size(0))

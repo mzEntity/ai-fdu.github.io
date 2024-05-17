@@ -18,17 +18,24 @@ def load_RGB_or_Thermal(img_path):
 def load_Target(gt_path):
     gt_file = h5py.File(gt_path)
     target = np.asarray(gt_file['density'])
-    target = cv2.resize(target, (224, 224), interpolation=cv2.INTER_CUBIC)
+    target = cv2.resize(target, (target.shape[1]//8, target.shape[0]//8), interpolation=cv2.INTER_CUBIC)*64
     return target
 
 class TrainCrowd(Dataset):
     def __init__(self, shape=None, batch_size=1, num_workers=4):
-        self.transform = transforms.Compose([
+        self.RGB_transform = transforms.Compose([
             transforms.ToTensor(),
             transforms.Normalize(
-                mean=[0.485, 0.456, 0.406], 
-                std=[0.229, 0.224, 0.225]
+                mean=[0.407, 0.389, 0.396],
+                std=[0.241, 0.246, 0.242]
             ),
+        ])
+        self.T_transform = transforms.Compose([
+            transforms.ToTensor(),
+            transforms.Normalize(
+                mean=[0.492, 0.168, 0.430],
+                std=[0.317, 0.174, 0.191]
+            )
         ])
         self.shape = shape
         self.batch_size = batch_size
@@ -67,8 +74,8 @@ class TrainCrowd(Dataset):
         gt_path = os.path.join(self.gt_dir, os.path.splitext(img_name)[0] + '.h5')
         target = load_Target(gt_path)
 
-        if self.transform is not None:
-            img_RGB = self.transform(img_RGB)
-            img_Thermal = self.transform(img_Thermal)    
+
+        img_RGB = self.RGB_transform(img_RGB)
+        img_Thermal = self.T_transform(img_Thermal)
 
         return [img_RGB, img_Thermal], target
