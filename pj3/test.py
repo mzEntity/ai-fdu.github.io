@@ -2,7 +2,7 @@ import PIL.Image as Image
 import torchvision.transforms.functional as F
 import torch
 # from model import CSRNet
-from transcc.nets.RGBTCCNet import ThermalRGBNet
+from nets.RGBTCCNet import ThermalRGBNet
 from torchvision import transforms
 from torch.autograd import Variable
 
