@@ -98,8 +98,9 @@ class RegTrainer(Trainer):
             self.train_eopch()
             if epoch % args.val_epoch == 0 and epoch >= args.val_start:
                 mae_is_best, mse_is_best = self.val_epoch()
-            if epoch >= args.val_start and (mse_is_best or mae_is_best ):#or (epoch > 200 and epoch % 5 == 0)):
-                self.test_epoch()
+                print(f"mae_best: {mae_is_best}, mse_best: {mse_is_best}")
+            # if epoch >= args.val_start and (mse_is_best or mae_is_best ):#or (epoch > 200 and epoch % 5 == 0)):
+            #     self.test_epoch()
 
     def train_eopch(self):
         epoch_ot_loss = AverageMeter()
@@ -223,7 +224,8 @@ class RegTrainer(Trainer):
             logging.info("save best mse {:.2f} mae {:.2f} model epoch {}".format(self.best_mse,
                                                                                      self.best_mae,
                                                                                      self.epoch))
-
+            model_state_dic = self.model.state_dict()
+            torch.save(model_state_dic, os.path.join(self.save_dir, 'best_model_{}.pth'.format(mae)))
         return mae_is_best, mse_is_best
 
     def test_epoch(self):
