@@ -15,7 +15,7 @@ import cv2
 
 def load_RGB_or_Thermal(img_path):
     img = Image.open(img_path).convert('RGB')
-    if img[0] > img[1]:
+    if img.shape[0] > img.shape[1]:
         rate_0 =672.0 / img.shape[0]
         rate_1 =448.0 / img.shape[1]
         img =cv2.resize(img, (0, 0), fx=rate_0, fy=rate_1)
