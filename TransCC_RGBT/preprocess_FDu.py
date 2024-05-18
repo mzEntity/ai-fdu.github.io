@@ -32,7 +32,7 @@ for option in options:
         
         rgb_save_path = os.path.join(dst_base_path, os.path.basename(rgb_path)).replace(".jpg", "_RGB.jpg")
         t_save_path = rgb_save_path.replace("_RGB.jpg", "_T.jpg")
-        # print(f"from {rgb_path} to {rgb_save_path}; from {tir_path} to {t_save_path}")
+        print(os.path.basename(rgb_path))
         cv2.imwrite(rgb_save_path, rgb)
         cv2.imwrite(t_save_path, t)
         
