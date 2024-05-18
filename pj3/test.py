@@ -30,8 +30,8 @@ model.eval()  # 设置模型为评估模式
 with torch.no_grad():  # 关闭梯度计算，节省内存和计算资源
     for i, (inputs, file_number) in enumerate(test_loader):
         print(i)
-        if i > 2:
-            break
+        # if i > 2:
+        #     break
         if type(inputs) == list:
             inputs[0] = inputs[0].to(device)
             inputs[1] = inputs[1].to(device)
@@ -47,9 +47,7 @@ with torch.no_grad():  # 关闭梯度计算，节省内存和计算资源
         img_RGB = inputs[0]
         img_Thermal = inputs[1]
         file_number = int(file_number)
-        print(f"imgRGB: {img_RGB.shape}, Thermal: {img_Thermal.shape}")
         count, output, output_normed = model([img_RGB, img_Thermal]) 
-        print(f"count: {count}, output: {output}")
         ans = output.detach().cpu().sum()  
         formatted_ans = "{:.2f}".format(ans.item())
         results.append([file_number, f"{file_number},{formatted_ans}\n"])
