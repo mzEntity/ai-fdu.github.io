@@ -9,6 +9,7 @@ import cv2
 import json
 
 
+# 从im_h * im_w中切割出crop_h * crop_w大小的图片，返回图片左上角（四个点中较小的的x和y）坐标
 def random_crop(im_h, im_w, crop_h, crop_w):
     res_h = im_h - crop_h
     res_w = im_w - crop_w
