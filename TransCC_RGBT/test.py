@@ -63,7 +63,7 @@ if __name__ == '__main__':
             
             ans = torch.sum(outputs)
             formatted_ans = "{:.2f}".format(ans.item())
-            name = int(name)
+            name = int(name[0])
             epoch_res.append([name, f"{name},{formatted_ans}\n"])
 
             # res = torch.sum(target).item() - torch.sum(outputs).item()
