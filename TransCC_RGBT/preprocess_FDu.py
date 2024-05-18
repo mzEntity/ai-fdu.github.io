@@ -24,7 +24,9 @@ for option in options:
     for rgb_path in glob.glob(os.path.join(rgb_base_path, '*.jpg')):
         rgb_paths.append(rgb_path)
         
+    i = 0
     for rgb_path in rgb_paths:
+        print(f"{option}: {i}")
         Img_data = cv2.imread(rgb_path)
         
         tir_path = rgb_path.replace("rgb", "tir").replace(".jpg", "R.jpg")
@@ -34,9 +36,11 @@ for option in options:
         
         rgb_save_path = os.path.join(dst_base_path, os.path.basename(rgb_path)).replace(".jpg", "_RGB.jpg")
         t_save_path = rgb_save_path.replace("_RGB.jpg", "_T.jpg")
-        print(f"move {os.path.basename(rgb_path)}")
+
         cv2.imwrite(rgb_save_path, rgb)
         cv2.imwrite(t_save_path, t)
+        
+        i = i + 1
         
         
 import xml.etree.ElementTree as ET
@@ -80,8 +84,10 @@ if not os.path.exists(dst_base_path):
 
 label_base_path = os.path.join(src_base_path, "labels/")
 
-for label_path in glob.glob(os.path.join(rgb_base_path, '*R.xml')):
+i = 0
+for label_path in glob.glob(os.path.join(src_base_path, '*R.xml')):
     json_path = os.path.join(dst_base_path, os.path.basename(label_path)).replace("R.xml", "_GT.json")
     points = parse_xml(label_path)
-    print(f"parse {os.path.basename(rgb_path)}: {len(points)}")
+    print(f"parse {i}: {len(points)}")
     save_to_json(points, json_path)
+    i = i + 1
