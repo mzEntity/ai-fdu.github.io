@@ -17,9 +17,10 @@ root = '../../rgbtcc_fdu/'
 options = ["train", "test", "val"]
 
 for option in options:
-    rgbt_cc = os.path.join(root, option, "/")
+    dir = f"{option}/"
+    rgbt_cc = os.path.join(root, dir)
 
-    '''for part A'''
+    print(f"start process {option}")
     if not os.path.exists(rgbt_cc.replace(option, f'new_{option}_224')):
         os.makedirs(rgbt_cc.replace(option, f'new_{option}_224'))
 
