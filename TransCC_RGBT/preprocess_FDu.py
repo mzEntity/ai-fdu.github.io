@@ -33,8 +33,8 @@ for option in options:
         
         tir_path = rgb_path.replace("rgb", "tir").replace(".jpg", "R.jpg")
 
-        rgb = cv2.imread(rgb_path)[..., ::-1].copy()
-        t = cv2.imread(tir_path)[..., ::-1].copy()
+        rgb = cv2.imread(rgb_path)
+        t = cv2.imread(tir_path)
         
         rgb_save_path = os.path.join(dst_base_path, os.path.basename(rgb_path)).replace(".jpg", "_RGB.jpg")
         t_save_path = rgb_save_path.replace("_RGB.jpg", "_T.jpg")
