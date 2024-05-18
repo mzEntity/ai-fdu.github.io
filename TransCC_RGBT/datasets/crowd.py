@@ -50,7 +50,7 @@ class Crowd(data.Dataset):
                  method='train'):
         print("init_Crowd dataset")
         self.root_path = root_path
-        self.gt_list = sorted(glob(os.path.join(self.root_path, '*.npy')))  # change to npy for gt_list
+        self.rgb_list = sorted(glob(os.path.join(self.root_path, '*_RGB.jpg')))
         if method not in ['train', 'val', 'test']:
             raise Exception("not implement")
         self.method = method
@@ -74,28 +74,38 @@ class Crowd(data.Dataset):
         ])
 
     def __len__(self):
-        return len(self.gt_list)
+        return len(self.rgb_list)
 
     def __getitem__(self, item):
-        gt_path = self.gt_list[item]
-        rgb_path = gt_path.replace('GT', 'RGB').replace('npy', 'jpg')
-        t_path = gt_path.replace('GT', 'T').replace('npy', 'jpg')
+        rgb_path = self.rgb_list[item]
+        
+        gt_path = rgb_path.replace("RGB.jpg", "GT.npy")
+        t_path = rgb_path.replace('RGB', 'T')
 
         RGB = cv2.imread(rgb_path)[..., ::-1].copy()
         T = cv2.imread(t_path)[..., ::-1].copy()
+        
+        
+        gt_exist = os.path.exists(gt_path)
 
         if self.method == 'train':
+            if not gt_exist:
+                print("error in training: cannot find npy file")
             keypoints = np.load(gt_path)
             return self.train_transform(RGB, T, keypoints)
 
         elif self.method == 'val' or self.method == 'test':
-            keypoints = np.load(gt_path)
-            gt = keypoints
-            k = np.zeros((T.shape[0], T.shape[1]))
-            for i in range(0, len(gt)):
-                if int(gt[i][1]) < T.shape[0] and int(gt[i][0]) < T.shape[1]:
-                    k[int(gt[i][1]), int(gt[i][0])] = 1
-            target = k
+            if gt_exist:
+                keypoints = np.load(gt_path)
+                gt = keypoints
+                k = np.zeros((T.shape[0], T.shape[1]))
+                for i in range(0, len(gt)):
+                    if int(gt[i][1]) < T.shape[0] and int(gt[i][0]) < T.shape[1]:
+                        k[int(gt[i][1]), int(gt[i][0])] = 1
+                target = k
+            else:
+                target = None
+            
             RGB = self.RGB_transform(RGB)
             T = self.T_transform(T)
             width, height = RGB.shape[2], RGB.shape[1]
