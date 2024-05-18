@@ -112,7 +112,7 @@ class Crowd(data.Dataset):
                         img_return = torch.cat([img_return, crop_img], 0).cuda()
                         t_return = torch.cat([t_return, crop_t], 0).cuda()
 
-            name = os.path.basename(gt_path).split('.')[0]
+            name = os.path.basename(gt_path).split('_GT')[0]
             input = [img_return, t_return]
             return input, target, name
 

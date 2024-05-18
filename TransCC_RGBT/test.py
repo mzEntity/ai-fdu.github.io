@@ -59,24 +59,35 @@ if __name__ == '__main__':
             outputs2 = torch.cat((outputs[2], outputs[3]), dim=1)
             outputs3 = torch.cat((outputs[4], outputs[5]), dim=1)
             outputs = torch.cat((outputs1, outputs2, outputs3), dim=2)
+            
+            ans = torch.sum(outputs).item()
+            formatted_ans = "{:.2f}".format(ans.item())
+            
+            epoch_res.append([name, f"{name},{formatted_ans}\n"])
 
-            res = torch.sum(target).item() - torch.sum(outputs).item()
-            epoch_res.append(res)
+            # res = torch.sum(target).item() - torch.sum(outputs).item()
+            # epoch_res.append(res)
 
-            for L in range(4):
-                abs_error, square_error = eval_game(outputs, target, L)
-                game[L] += abs_error
-                mse[L] += square_error
-    N = len(dataloader)
-    epoch_res = np.array(epoch_res)
-    mse1 = np.sqrt(np.mean(np.square(epoch_res)))
-    mae1 = np.mean(np.abs(epoch_res))
-    print(mae1)
-    game = [m / N for m in game]
-    mse = [math.sqrt(m / N) for m in mse]
-    total_relative_error = total_relative_error / N
-    log_str = 'Test{}, GAME0 {game0:.2f} GAME1 {game1:.2f} GAME2 {game2:.2f} GAME3 {game3:.2f} ' \
-              'MSE {mse:.2f}  '. \
-        format(N, game0=game[0], game1=game[1], game2=game[2], game3=game[3], mse=mse[0])
-    print(log_str)
+            # for L in range(4):
+            #     abs_error, square_error = eval_game(outputs, target, L)
+            #     game[L] += abs_error
+            #     mse[L] += square_error
+            
+
+    epoch_res.sort()
+    with open('./ans.txt', 'w') as file:
+        for result in epoch_res:
+            file.writelines(result[1])
+    # N = len(dataloader)
+    # epoch_res = np.array(epoch_res)
+    # mse1 = np.sqrt(np.mean(np.square(epoch_res)))
+    # mae1 = np.mean(np.abs(epoch_res))
+    # print(mae1)
+    # game = [m / N for m in game]
+    # mse = [math.sqrt(m / N) for m in mse]
+    # total_relative_error = total_relative_error / N
+    # log_str = 'Test{}, GAME0 {game0:.2f} GAME1 {game1:.2f} GAME2 {game2:.2f} GAME3 {game3:.2f} ' \
+    #           'MSE {mse:.2f}  '. \
+    #     format(N, game0=game[0], game1=game[1], game2=game[2], game3=game[3], mse=mse[0])
+    # print(log_str)
 
