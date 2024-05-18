@@ -23,8 +23,8 @@ def generate_data(label_path):
 
 if __name__ == '__main__':
 
-    root_path = ''  # dataset root path
-    save_dir = ''
+    root_path = '../../rgbtcc_ds/'  # dataset root path
+    save_dir = '../../my_rgbtcc_ds/'
 
     for phase in ['train', 'val', 'test']:
         sub_dir = os.path.join(root_path, phase)
