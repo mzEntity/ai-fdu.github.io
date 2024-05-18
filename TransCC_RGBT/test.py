@@ -60,7 +60,7 @@ if __name__ == '__main__':
             outputs3 = torch.cat((outputs[4], outputs[5]), dim=1)
             outputs = torch.cat((outputs1, outputs2, outputs3), dim=2)
             
-            ans = torch.sum(outputs).item()
+            ans = torch.sum(outputs)
             formatted_ans = "{:.2f}".format(ans.item())
             
             epoch_res.append([name, f"{name},{formatted_ans}\n"])
