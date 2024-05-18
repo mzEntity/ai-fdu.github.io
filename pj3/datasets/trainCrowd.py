@@ -50,14 +50,15 @@ def gen_discrete_map(im_height, im_width, points):
 def load_RGB_or_Thermal(img_path):
     img = Image.open(img_path).convert('RGB')
     width, height = img.size
-    if height > width:
-        new_width = int(448.0)
-        new_height = int(672.0)
+    if width > height:
+        rate_0 =672.0 / width
+        rate_1 =448.0 / height
+        img =cv2.resize(img, (0, 0), fx=rate_0, fy=rate_1)
     else:
-        new_width = int(672.0)
-        new_height = int(448.0)
-    img_resized = img.resize((new_width, new_height), Image.ANTIALIAS)
-    return img_resized
+        rate_0 = 448.0 / width
+        rate_1 = 672.0 / height
+        img =cv2.resize(img, (0, 0), fx=rate_0, fy=rate_1)
+    return img
 
 def load_Target(gt_path):
     gt_file = h5py.File(gt_path)
