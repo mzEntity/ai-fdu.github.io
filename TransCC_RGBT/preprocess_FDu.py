@@ -2,7 +2,7 @@ import os
 import glob
 import cv2
 
-src_path = "./dataset/"
+src_path = "../pj3/dataset/"
 dst_path = "../../my_dataset/"
 
 
