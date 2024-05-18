@@ -41,7 +41,8 @@ if __name__ == '__main__':
     total_relative_error = 0
     epoch_res = []
     for idx, (inputs, target, name) in enumerate(dataloader):
-        print(idx)
+        # print(idx)
+        print(name)
         if type(inputs) == list:
             inputs[0] = inputs[0].to(device)
             inputs[1] = inputs[1].to(device)
