@@ -28,13 +28,10 @@ results = []
 
 model.eval()  # 设置模型为评估模式
 with torch.no_grad():  # 关闭梯度计算，节省内存和计算资源
-    for i, (inputs, target, file_number) in enumerate(test_loader):
+    for i, (img_RGB, img_Thermal, file_number) in enumerate(test_loader):
         print(i)
         if i > 2:
             break
-        
-        img_RGB = inputs[0]
-        img_Thermal = inputs[1]
         
         img_RGB = img_RGB.to(device)
         img_Thermal = img_Thermal.to(device)
