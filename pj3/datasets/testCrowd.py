@@ -15,15 +15,15 @@ import cv2
 
 def load_RGB_or_Thermal(img_path):
     img = Image.open(img_path).convert('RGB')
-    if img.shape[0] > img.shape[1]:
-        rate_0 =672.0 / img.shape[0]
-        rate_1 =448.0 / img.shape[1]
-        img =cv2.resize(img, (0, 0), fx=rate_0, fy=rate_1)
+    width, height = img.size
+    if height > width:
+        new_width = int(448.0)
+        new_height = int(672.0)
     else:
-        rate_0 = 448.0 / img.shape[0]
-        rate_1 = 672.0 / img.shape[1]
-        img =cv2.resize(img, (0, 0), fx=rate_0, fy=rate_1)
-    return img
+        new_width = int(672.0)
+        new_height = int(448.0)
+    img_resized = img.resize((new_width, new_height), Image.ANTIALIAS)
+    return img_resized
 
 class TestCrowd(Dataset):
     def __init__(self, batch_size=1):
