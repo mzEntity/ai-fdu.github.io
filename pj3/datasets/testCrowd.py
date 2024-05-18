@@ -10,10 +10,19 @@ from torchvision import transforms
 from torch.utils.data import Dataset, DataLoader
 from PIL import Image
 import numpy as np
+import cv2
 
 
 def load_RGB_or_Thermal(img_path):
     img = Image.open(img_path).convert('RGB')
+    if img[0] > img[1]:
+        rate_0 =672.0 / img.shape[0]
+        rate_1 =448.0 / img.shape[1]
+        img =cv2.resize(img, (0, 0), fx=rate_0, fy=rate_1)
+    else:
+        rate_0 = 448.0 / img.shape[0]
+        rate_1 = 672.0 / img.shape[1]
+        img =cv2.resize(img, (0, 0), fx=rate_0, fy=rate_1)
     return img
 
 class TestCrowd(Dataset):
@@ -74,6 +83,7 @@ class TestCrowd(Dataset):
         width, height = RGB.shape[2], RGB.shape[1]
         m = int(width / 224)
         n = int(height / 224)
+        print(f"w: {width}, h: {height}, m: {m}, n: {n}")
         for i in range(0, m):
             for j in range(0, n):
                 if i == 0 and j == 0:
@@ -84,5 +94,4 @@ class TestCrowd(Dataset):
                     crop_t = T[:, j * 224: 224 * (j + 1), i * 224:(i + 1) * 224].cuda().unsqueeze(0)
                     img_return = torch.cat([img_return, crop_img], 0).cuda()
                     t_return = torch.cat([t_return, crop_t], 0).cuda()
-
         return img_return, t_return
