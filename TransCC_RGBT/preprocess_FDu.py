@@ -104,6 +104,7 @@ if not os.path.exists(dst_base_path):
 i = 0
 for json_path in glob.glob(os.path.join(src_base_path, '*_GT.json')):
     if i % 10 != 0:
+        i = i + 1
         continue
     rgb_path = json_path.replace("_GT.json", "_RGB.jpg")
     t_path = json_path.replace("_GT.json", "_T.jpg")
