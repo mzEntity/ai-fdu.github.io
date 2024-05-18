@@ -12,7 +12,7 @@ import random
 
 # 先224*224
 '''set your data path'''
-root = '../../my_rgbtcc_ds/'
+root = '../../rgbtcc_fdu/'
 
 rgbt_cc_train = os.path.join(root, 'train')
 rgbt_cc_test = os.path.join(root, 'test')

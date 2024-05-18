@@ -1,5 +1,5 @@
 python test.py \
-    --data-dir ../../my_rgbtcc_ds/ \
+    --data-dir ../../rgbtcc_fdu/ \
     --save-dir ./model \
     --model model_best.pth \
     --device 0
