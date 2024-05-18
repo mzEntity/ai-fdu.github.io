@@ -11,11 +11,11 @@ def generate_data(rgb_path):
     t = cv2.imread(t_path)[..., ::-1].copy()
     
     im_h, im_w, _ = rgb.shape
-    print('rgb and t shape', rgb.shape, t.shape)
     
     label_path = rgb_path.replace("_RGB.jpg", "_GT.npy")
     
     if not os.path.exists(label_path):
+        print(f"{label_path} not exists")
         return rgb, t, None
     
     with open(label_path, 'r') as f:
@@ -24,6 +24,7 @@ def generate_data(rgb_path):
     # print('points', points.shape)
     idx_mask = (points[:, 0] >= 0) * (points[:, 0] <= im_w) * (points[:, 1] >= 0) * (points[:, 1] <= im_h)
     points = points[idx_mask]
+    print(f"{label_path} exists")
     return rgb, t, points
 
 
