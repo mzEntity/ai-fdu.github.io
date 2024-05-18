@@ -41,8 +41,8 @@ if __name__ == '__main__':
     total_relative_error = 0
     epoch_res = []
     for idx, (inputs, target, name) in enumerate(dataloader):
-        # print(idx)
-        print(name)
+        print(idx)
+        
         if type(inputs) == list:
             inputs[0] = inputs[0].to(device)
             inputs[1] = inputs[1].to(device)
@@ -63,7 +63,7 @@ if __name__ == '__main__':
             
             ans = torch.sum(outputs)
             formatted_ans = "{:.2f}".format(ans.item())
-            
+            name = int(name)
             epoch_res.append([name, f"{name},{formatted_ans}\n"])
 
             # res = torch.sum(target).item() - torch.sum(outputs).item()
