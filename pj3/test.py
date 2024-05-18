@@ -21,21 +21,26 @@ test_loader = DataLoader(test_dataset, batch_size=batch_size, shuffle=False)
 model = ThermalRGBNet()
 model = model.to(device)
 checkpoint = torch.load('./model/model_best.pth.tar')
-model.load_state_dict(checkpoint['state_dict'])
+model.load_state_dict(checkpoint, strict=False)
 
 # 用于存储结果的列表
 results = []
 
 model.eval()  # 设置模型为评估模式
 with torch.no_grad():  # 关闭梯度计算，节省内存和计算资源
-    for i, (img_RGB, img_Thermal,file_number) in enumerate(test_loader):
+    for i, (inputs, target, file_number) in enumerate(test_loader):
         print(i)
         if i > 2:
             break
+        
+        img_RGB = inputs[0]
+        img_Thermal = inputs[1]
+        
         img_RGB = img_RGB.to(device)
         img_Thermal = img_Thermal.to(device)
         file_number = int(file_number)
         count, output, output_normed = model([img_RGB, img_Thermal]) 
+        print(f"count: {count}, output: {output}")
         ans = output.detach().cpu().sum()  
         formatted_ans = "{:.2f}".format(ans.item())
         results.append([file_number, f"{file_number},{formatted_ans}\n"])

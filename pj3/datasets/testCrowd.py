@@ -11,10 +11,18 @@ from torch.utils.data import Dataset, DataLoader
 from PIL import Image
 import numpy as np
 
+import h5py
+
 
 def load_RGB_or_Thermal(img_path):
     img = Image.open(img_path).convert('RGB')
     return img
+
+def load_Target(gt_path):
+    gt_file = h5py.File(gt_path)
+    target = np.asarray(gt_file['density'])
+    # target = cv2.resize(target, (target.shape[1]//8, target.shape[0]//8), interpolation=cv2.INTER_CUBIC)*64
+    return target
 
 class TestCrowd(Dataset):
     def __init__(self, batch_size=1):
@@ -58,17 +66,27 @@ class TestCrowd(Dataset):
         rgb_img_path, thermal_img_path = self.img_paths[index]
         img_RGB = load_RGB_or_Thermal(rgb_img_path)
         img_Thermal = load_RGB_or_Thermal(thermal_img_path)
+        
+        img_name = os.path.basename(rgb_img_path)
+        gt_path = os.path.join(self.gt_dir, os.path.splitext(img_name)[0] + '.h5')
+        target = load_Target(gt_path)
          
         # 获得index，比如10.jpg，获得10
         parts = rgb_img_path.split('/')
         filename = parts[-1]
         file_number = filename.split('.')[0]
         
-        img_RGB, img_Thermal = self.test_transform(img_RGB, img_Thermal)
+        input, target = self.test_transform(img_RGB, img_Thermal, target)
 
-        return [img_RGB, img_Thermal, int(file_number)]
+        return input, target, int(file_number)
     
-    def test_transform(self, RGB, T):
+    def test_transform(self, RGB, T, keypoints):
+        gt = keypoints
+        k = np.zeros((T.shape[0], T.shape[1]))
+        for i in range(0, len(gt)):
+            if int(gt[i][1]) < T.shape[0] and int(gt[i][0]) < T.shape[1]:
+                k[int(gt[i][1]), int(gt[i][0])] = 1
+        target = k
         RGB = self.RGB_transform(RGB)
         T = self.T_transform(T)
         width, height = RGB.shape[2], RGB.shape[1]
@@ -85,4 +103,5 @@ class TestCrowd(Dataset):
                     img_return = torch.cat([img_return, crop_img], 0).cuda()
                     t_return = torch.cat([t_return, crop_t], 0).cuda()
 
-        return img_return, t_return
+        input = [img_return, t_return]
+        return input, target
