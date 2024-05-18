@@ -6,6 +6,8 @@ src_path = "../pj3/dataset/"
 dst_path = "../../my_dataset/"
 
 
+print("start move jpgs")
+
 options = ["train/", "test/"]
 
 for option in options:
@@ -67,7 +69,8 @@ def save_to_json(points, json_path):
     
     with open(json_path, 'w') as json_file:
         json.dump(data, json_file, indent=4)
-        
+
+print("start parse xmls")        
         
 src_base_path = os.path.join(src_path, "train/")
 dst_base_path = os.path.join(dst_path, "train/")
@@ -77,7 +80,6 @@ if not os.path.exists(dst_base_path):
 
 label_base_path = os.path.join(src_base_path, "labels/")
 
-label_paths = []
 for label_path in glob.glob(os.path.join(rgb_base_path, '*R.xml')):
     json_path = os.path.join(dst_base_path, os.path.basename(label_path)).replace("R.xml", "_GT.json")
     points = parse_xml(label_path)
