@@ -58,10 +58,7 @@ class TestCrowd(Dataset):
         rgb_img_path, thermal_img_path = self.img_paths[index]
         img_RGB = load_RGB_or_Thermal(rgb_img_path)
         img_Thermal = load_RGB_or_Thermal(thermal_img_path)
-
-        img_RGB = self.RGB_transform(img_RGB)
-        img_Thermal = self.T_transform(img_Thermal)    
-        
+         
         # 获得index，比如10.jpg，获得10
         parts = rgb_img_path.split('/')
         filename = parts[-1]
