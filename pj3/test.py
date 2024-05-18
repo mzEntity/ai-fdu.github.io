@@ -28,13 +28,24 @@ results = []
 
 model.eval()  # 设置模型为评估模式
 with torch.no_grad():  # 关闭梯度计算，节省内存和计算资源
-    for i, (img_RGB, img_Thermal, file_number) in enumerate(test_loader):
+    for i, (inputs, file_number) in enumerate(test_loader):
         print(i)
         if i > 2:
             break
-        
-        img_RGB = img_RGB.to(device)
-        img_Thermal = img_Thermal.to(device)
+        if type(inputs) == list:
+            inputs[0] = inputs[0].to(device)
+            inputs[1] = inputs[1].to(device)
+        else:
+            inputs = inputs.to(device)
+        if len(inputs[0].shape) == 5:
+            inputs[0] = inputs[0].squeeze(0)
+            inputs[1] = inputs[1].squeeze(0)
+        if len(inputs[0].shape) == 3:
+            inputs[0] = inputs[0].unsqueeze(0)
+            inputs[1] = inputs[1].unsqueeze(0)
+            
+        img_RGB = inputs[0]
+        img_Thermal = inputs[1]
         file_number = int(file_number)
         print(f"imgRGB: {img_RGB.shape}, Thermal: {img_Thermal.shape}")
         count, output, output_normed = model([img_RGB, img_Thermal]) 

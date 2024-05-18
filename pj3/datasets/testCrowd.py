@@ -66,7 +66,7 @@ class TestCrowd(Dataset):
         
         img_RGB, img_Thermal = self.test_transform(img_RGB, img_Thermal)
 
-        return [img_RGB, img_Thermal, int(file_number)]
+        return [img_RGB, img_Thermal], int(file_number)
     
     def test_transform(self, RGB, T):
         RGB = self.RGB_transform(RGB)
