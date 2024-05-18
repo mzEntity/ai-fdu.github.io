@@ -12,7 +12,7 @@ def generate_data(rgb_path):
     
     im_h, im_w, _ = rgb.shape
     
-    label_path = rgb_path.replace("_RGB.jpg", "_GT.npy")
+    label_path = rgb_path.replace("_RGB.jpg", "_GT.json")
     
     if not os.path.exists(label_path):
         print(f"{label_path} not exists")
