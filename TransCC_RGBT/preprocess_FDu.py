@@ -6,41 +6,41 @@ src_path = "../pj3/dataset/"
 dst_path = "../../my_dataset/"
 
 
-print("start move jpgs")
+# print("start move jpgs")
 
-options = ["train/", "test/"]
+# options = ["train/", "test/"]
 
-for option in options:
-    src_base_path = os.path.join(src_path, option)
-    dst_base_path = os.path.join(dst_path, option)
+# for option in options:
+#     src_base_path = os.path.join(src_path, option)
+#     dst_base_path = os.path.join(dst_path, option)
 
-    if not os.path.exists(dst_base_path):
-        os.makedirs(dst_base_path)
+#     if not os.path.exists(dst_base_path):
+#         os.makedirs(dst_base_path)
 
-    rgb_base_path = os.path.join(src_base_path, "rgb/")
-    tir_base_path = os.path.join(src_base_path, "tir/")
+#     rgb_base_path = os.path.join(src_base_path, "rgb/")
+#     tir_base_path = os.path.join(src_base_path, "tir/")
 
-    rgb_paths = []
-    for rgb_path in glob.glob(os.path.join(rgb_base_path, '*.jpg')):
-        rgb_paths.append(rgb_path)
+#     rgb_paths = []
+#     for rgb_path in glob.glob(os.path.join(rgb_base_path, '*.jpg')):
+#         rgb_paths.append(rgb_path)
         
-    i = 0
-    for rgb_path in rgb_paths:
-        print(f"{option}: {i}")
-        Img_data = cv2.imread(rgb_path)
+#     i = 0
+#     for rgb_path in rgb_paths:
+#         print(f"{option}: {i}")
+#         Img_data = cv2.imread(rgb_path)
         
-        tir_path = rgb_path.replace("rgb", "tir").replace(".jpg", "R.jpg")
+#         tir_path = rgb_path.replace("rgb", "tir").replace(".jpg", "R.jpg")
 
-        rgb = cv2.imread(rgb_path)[..., ::-1].copy()
-        t = cv2.imread(tir_path)[..., ::-1].copy()
+#         rgb = cv2.imread(rgb_path)[..., ::-1].copy()
+#         t = cv2.imread(tir_path)[..., ::-1].copy()
         
-        rgb_save_path = os.path.join(dst_base_path, os.path.basename(rgb_path)).replace(".jpg", "_RGB.jpg")
-        t_save_path = rgb_save_path.replace("_RGB.jpg", "_T.jpg")
+#         rgb_save_path = os.path.join(dst_base_path, os.path.basename(rgb_path)).replace(".jpg", "_RGB.jpg")
+#         t_save_path = rgb_save_path.replace("_RGB.jpg", "_T.jpg")
 
-        cv2.imwrite(rgb_save_path, rgb)
-        cv2.imwrite(t_save_path, t)
+#         cv2.imwrite(rgb_save_path, rgb)
+#         cv2.imwrite(t_save_path, t)
         
-        i = i + 1
+#         i = i + 1
         
         
 import xml.etree.ElementTree as ET
@@ -85,7 +85,7 @@ if not os.path.exists(dst_base_path):
 label_base_path = os.path.join(src_base_path, "labels/")
 
 i = 0
-for label_path in glob.glob(os.path.join(src_base_path, '*R.xml')):
+for label_path in glob.glob(os.path.join(label_base_path, '*R.xml')):
     json_path = os.path.join(dst_base_path, os.path.basename(label_path)).replace("R.xml", "_GT.json")
     points = parse_xml(label_path)
     print(f"parse {i}: {len(points)}")
