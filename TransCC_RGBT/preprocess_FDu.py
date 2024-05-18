@@ -32,7 +32,7 @@ for option in options:
         
         rgb_save_path = os.path.join(dst_base_path, os.path.basename(rgb_path)).replace(".jpg", "_RGB.jpg")
         t_save_path = rgb_save_path.replace("_RGB.jpg", "_T.jpg")
-        print(os.path.basename(rgb_path))
+        print(f"move {os.path.basename(rgb_path)}")
         cv2.imwrite(rgb_save_path, rgb)
         cv2.imwrite(t_save_path, t)
         
@@ -81,4 +81,5 @@ label_paths = []
 for label_path in glob.glob(os.path.join(rgb_base_path, '*R.xml')):
     json_path = os.path.join(dst_base_path, os.path.basename(label_path)).replace("R.xml", "_GT.json")
     points = parse_xml(label_path)
+    print(f"parse {os.path.basename(rgb_path)}: {len(points)}")
     save_to_json(points, json_path)
