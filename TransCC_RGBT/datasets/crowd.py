@@ -104,7 +104,7 @@ class Crowd(data.Dataset):
                         k[int(gt[i][1]), int(gt[i][0])] = 1
                 target = k
             else:
-                target = None
+                target = np.zeros((T.shape[0], T.shape[1]))
             
             RGB = self.RGB_transform(RGB)
             T = self.T_transform(T)
