@@ -127,7 +127,7 @@ for label_path in glob.glob(os.path.join(label_base_path, '*R.xml')):
             new_points.append([(point[0] + width) / 2, point[1]])
             new_points.append([point[0], (point[1] + height) / 2])
             new_points.append([point[0], point[1]])
-        save_to_json(points, new_json_path)
+        save_to_json(new_points, new_json_path)
     i = i + 1
 
 import shutil    
