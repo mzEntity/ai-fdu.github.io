@@ -9,7 +9,7 @@ def parse_args():
     parser = argparse.ArgumentParser(description='Train ')
     parser.add_argument('--data-dir', default='./rgbtcc_fdu',
                         help='training data directory')
-    parser.add_argument('--save-dir', default='./ckpts_PVTV2_r224',
+    parser.add_argument('--save-dir', default='./model',
                         help='directory to save models.')
     parser.add_argument('--lr', type=float, default=1e-5,
                         help='the initial learning rate')
@@ -21,7 +21,7 @@ def parse_args():
     # Net need
     parser.add_argument('--img_size', default=224, type=int, help='network input size')
     parser.add_argument('--pretrained_model',
-                        default=r'F:\Pre_Parameters\pvt_v2_b3.pth', type=str,
+                        default='../../best_model/model_best.pth', type=str,
                         help='load Pretrained model')
     # default
     parser.add_argument('--weight-decay', type=float, default=1e-4,
@@ -55,7 +55,7 @@ def parse_args():
     parser.add_argument('--num-of-iter-in-ot', type=int, default=100,
                         help='sinkhorn iterations')
     parser.add_argument('--norm-cood', type=int, default=0, help='whether to norm cood when computing distance')
-    parser.add_argument('--model', default='./best_model_10.762619034647942.pth'
+    parser.add_argument('--model', default='../../best_model/model_best.pth'
                     , help='model name')
     args = parser.parse_args()
     return args
