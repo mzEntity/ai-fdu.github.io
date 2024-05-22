@@ -3,7 +3,7 @@ import glob
 import cv2
 import numpy as np
 
-src_path = "../../dataset/"
+src_path = "../../my_dataset/"
 dst_path = "./my_dataset/"
 
 def resizeJPG(image):
