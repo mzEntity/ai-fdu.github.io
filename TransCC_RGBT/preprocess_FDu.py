@@ -7,7 +7,7 @@ src_path = "../../my_dataset/"
 dst_path = "./my_dataset/"
 
 def resizeJPG(image):
-    height, width = image.shape[:3]
+    height, width = image.shape[:2]
 
     resized_image = cv2.resize(image, (width // 2, height // 2))
     
