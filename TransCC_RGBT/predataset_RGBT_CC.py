@@ -12,7 +12,7 @@ import random
 
 # 先224*224
 '''set your data path'''
-root = '../../rgbtcc_fdu/'
+root = './rgbtcc_fdu/'
 
 options = ["train", "test", "val"]
 

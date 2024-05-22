@@ -16,6 +16,7 @@ from nets.RGBTCCNet import ThermalRGBNet
 sys.path.append(os.path.join(os.path.dirname(__file__), ".."))
 from datasets.crowd import Crowd
 from losses.ot_loss import OT_Loss
+from tqdm import tqdm
 
 def train_collate(batch):
     transposed_batch = list(zip(*batch))
@@ -61,20 +62,16 @@ class RegTrainer(Trainer):
                                           pin_memory=(True if x == 'train' else False))
                             for x in ['train', 'val', 'test']}
 
-        self.model = ThermalRGBNet(args)
+        self.model = ThermalRGBNet()
         self.model.to(self.device)
         self.optimizer = optim.Adam(self.model.parameters(), lr=args.lr, weight_decay=args.weight_decay)
 
         self.start_epoch = 0
-        if args.resume:
-            suf = args.resume.rsplit('.', 1)[-1]
-            if suf == 'tar':
-                checkpoint = torch.load(args.resume, self.device)
-                self.model.load_state_dict(checkpoint['model_state_dict'])
-                self.optimizer.load_state_dict(checkpoint['optimizer_state_dict'])
-                self.start_epoch = checkpoint['epoch'] + 1
-            elif suf == 'pth':
-                self.model.load_state_dict(torch.load(args.resume, self.device))
+        if args.model:
+            print("load pretrained parameters")
+            model_path = args.model
+            checkpoint = torch.load(model_path, self.device)
+            self.model.load_state_dict(checkpoint, strict=False)
 
         self.ot_loss = OT_Loss(args.crop_size, self.downsample_ratio, args.norm_cood, self.device, args.num_of_iter_in_ot,
                                args.reg)
@@ -96,11 +93,8 @@ class RegTrainer(Trainer):
             logging.info('-'*5 + 'Epoch {}/{}'.format(epoch, args.max_epoch - 1) + '-'*5)
             self.epoch = epoch
             self.train_eopch()
-            if epoch % args.val_epoch == 0 and epoch >= args.val_start:
-                mae_is_best, mse_is_best = self.val_epoch()
-                print(f"mae_best: {mae_is_best}, mse_best: {mse_is_best}")
-            # if epoch >= args.val_start and (mse_is_best or mae_is_best ):#or (epoch > 200 and epoch % 5 == 0)):
-            #     self.test_epoch()
+            mae_is_best, mse_is_best = self.val_epoch()
+            print(f"mae_best: {mae_is_best}, mse_best: {mse_is_best}")
 
     def train_eopch(self):
         epoch_ot_loss = AverageMeter()
@@ -115,7 +109,9 @@ class RegTrainer(Trainer):
         self.model.train()  # Set model to training mode
 
         # Iterate over data.
-        for step, (inputs, points, gt_discrete, st_sizes) in enumerate(self.dataloaders['train']):
+        # for step, (inputs, points, gt_discrete, st_sizes) in enumerate(self.dataloaders['train']):
+        for step, (inputs, points, gt_discrete, st_sizes) in enumerate(tqdm(self.dataloaders['train'], desc="Training Progress")):
+    
 
             if type(inputs) == list:
                 inputs[0] = inputs[0].to(self.device)
@@ -224,44 +220,42 @@ class RegTrainer(Trainer):
             logging.info("save best mse {:.2f} mae {:.2f} model epoch {}".format(self.best_mse,
                                                                                      self.best_mae,
                                                                                      self.epoch))
-            model_state_dic = self.model.state_dict()
-            torch.save(model_state_dic, os.path.join(self.save_dir, 'best_model_{}.pth'.format(mae)))
+            torch.save(self.model.state_dict(), os.path.join(self.save_dir, 'best_model.pth'))
         return mae_is_best, mse_is_best
 
     def test_epoch(self):
-        args = self.args
-        self.model.eval()  # Set model to evaluate mode
-        epoch_start = time.time()
-        total_relative_error = 0
+
+        self.model.eval()
+
+        print('testing...')
+        # Iterate over data.
         epoch_res = []
+        # for idx, (inputs, target, name) in enumerate(dataloader):
         for inputs, target, name in self.dataloaders['test']:
             if type(inputs) == list:
                 inputs[0] = inputs[0].to(self.device)
                 inputs[1] = inputs[1].to(self.device)
             else:
                 inputs = inputs.to(self.device)
-
             if len(inputs[0].shape) == 5:
                 inputs[0] = inputs[0].squeeze(0)
                 inputs[1] = inputs[1].squeeze(0)
             if len(inputs[0].shape) == 3:
                 inputs[0] = inputs[0].unsqueeze(0)
                 inputs[1] = inputs[1].unsqueeze(0)
-
             with torch.set_grad_enabled(False):
-                _, outputs, _ = self.model(inputs)
-                res = torch.sum(target).item() - torch.sum(outputs).item()
-                epoch_res.append(res)
-                relative_error = eval_relative(outputs, target)
-                total_relative_error += relative_error
-        N = len(self.dataloaders['test'])
-        epoch_res = np.array(epoch_res)
-        mse = np.sqrt(np.mean(np.square(epoch_res)))
-        mae = np.mean(np.abs(epoch_res))
-        total_relative_error = total_relative_error / N
-        logging.info('Epoch {} test, MSE: {:.2f} MAE: {:.2f}, Re: {:.4f},Cost {:.1f} sec'
-                         .format(self.epoch, mse, mae, total_relative_error, time.time() - epoch_start))
-        model_state_dic = self.model.state_dict()
-        torch.save(model_state_dic, os.path.join(self.save_dir, 'best_model_{}.pth'.format(mae)))
+                count, outputs, _ = self.model(inputs)  # outputs batch_size为4
+                outputs1 = torch.cat((outputs[0], outputs[1]), dim=1)
+                outputs2 = torch.cat((outputs[2], outputs[3]), dim=1)
+                outputs3 = torch.cat((outputs[4], outputs[5]), dim=1)
+                outputs = torch.cat((outputs1, outputs2, outputs3), dim=2)
+                
+                ans = torch.sum(outputs)
+                formatted_ans = "{:.2f}".format(ans.item())
+                name = int(name[0])
+                epoch_res.append([name, f"{name},{formatted_ans}\n"])
 
-
+        epoch_res.sort()
+        with open('./ans.txt', 'w') as file:
+            for result in epoch_res:
+                file.writelines(result[1])

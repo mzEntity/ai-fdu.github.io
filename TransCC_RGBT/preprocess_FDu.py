@@ -1,13 +1,28 @@
 import os
 import glob
 import cv2
+import numpy as np
 
-src_path = "../pj3/dataset/"
-dst_path = "../../my_dataset/"
+src_path = "../../dataset/"
+dst_path = "./my_dataset/"
 
+def resizeJPG(image):
+    height, width = image.shape[:3]
+
+    resized_image = cv2.resize(image, (width // 2, height // 2))
+    
+    output_image = np.zeros((height, width, 3), dtype=np.uint8)
+
+    output_image[0:height//2, 0:width//2] = resized_image
+    output_image[0:height//2, width//2:width] = resized_image
+    output_image[height//2:height, 0:width//2] = resized_image
+    output_image[height//2:height, width//2:width] = resized_image
+    return output_image
 
 
 print("start move jpgs")
+
+more_jpg = True
 
 options = ["train/", "test/"]
 option2 = ""
@@ -41,6 +56,14 @@ for option in options:
 
         cv2.imwrite(rgb_save_path, rgb)
         cv2.imwrite(t_save_path, t)
+        
+        if option == "train/" and more_jpg:
+            new_rgb = resizeJPG(rgb)
+            new_t = resizeJPG(t)
+            new_rgb_save_path = rgb_save_path.replace("_RGB.jpg", "10000_RGB.jpg")
+            new_t_save_path = t_save_path.replace("_RGB.jpg", "10000_T.jpg")
+            cv2.imwrite(new_rgb_save_path, new_rgb)
+            cv2.imwrite(new_t_save_path, new_t)
         
         i = i + 1
         
@@ -89,9 +112,22 @@ label_base_path = os.path.join(src_base_path, "labels/")
 i = 0
 for label_path in glob.glob(os.path.join(label_base_path, '*R.xml')):
     json_path = os.path.join(dst_base_path, os.path.basename(label_path)).replace("R.xml", "_GT.json")
+    rgb_path = json_path.replace("_GT.json", "_RGB.jpg")
+    rgb_data = cv2.imread(rgb_path)
+    height, width = rgb_data.shape[:3]
+    
     points = parse_xml(label_path)
     print(f"parse {i}: {len(points)}")
     save_to_json(points, json_path)
+    if more_jpg:
+        new_points = []
+        new_json_path = json_path.replace("_GT.json", "10000_GT.json")
+        for point in points:
+            new_points.append([(point[0] + width) / 2, (point[1] + height) / 2])
+            new_points.append([(point[0] + width) / 2, point[1]])
+            new_points.append([point[0], (point[1] + height) / 2])
+            new_points.append([point[0], point[1]])
+        save_to_json(points, new_json_path)
     i = i + 1
 
 import shutil    

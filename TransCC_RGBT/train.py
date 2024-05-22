@@ -7,7 +7,7 @@ args = None
 
 def parse_args():
     parser = argparse.ArgumentParser(description='Train ')
-    parser.add_argument('--data-dir', default='F:/DataSets/RGBT_CC',
+    parser.add_argument('--data-dir', default='./rgbtcc_fdu',
                         help='training data directory')
     parser.add_argument('--save-dir', default='./ckpts_PVTV2_r224',
                         help='directory to save models.')
@@ -30,7 +30,7 @@ def parse_args():
                         help='max models num to save ')
     parser.add_argument('--max-epoch', type=int, default=500,
                         help='max training epoch')
-    parser.add_argument('--val-epoch', type=int, default=1,
+    parser.add_argument('--val_epoch', type=int, default=1,
                         help='the num of steps to log training information')
     parser.add_argument('--val_start', type=int, default=30,
                         help='the epoch start to val')
@@ -55,6 +55,8 @@ def parse_args():
     parser.add_argument('--num-of-iter-in-ot', type=int, default=100,
                         help='sinkhorn iterations')
     parser.add_argument('--norm-cood', type=int, default=0, help='whether to norm cood when computing distance')
+    parser.add_argument('--model', default='./best_model_10.762619034647942.pth'
+                    , help='model name')
     args = parser.parse_args()
     return args
 

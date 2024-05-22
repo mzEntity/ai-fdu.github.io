@@ -7,7 +7,7 @@ import random
 import numpy as np
 import cv2
 import json
-
+from PIL import Image
 
 def random_crop(im_h, im_w, crop_h, crop_w):
     res_h = im_h - crop_h
@@ -43,7 +43,6 @@ def gen_discrete_map(im_height, im_width, points):
     assert np.sum(discrete_map) == num_gt
     return discrete_map
 
-
 class Crowd(data.Dataset):
     def __init__(self, root_path, crop_size=256,
                  downsample_ratio=4,
@@ -60,18 +59,27 @@ class Crowd(data.Dataset):
         assert self.c_size % self.d_ratio == 0
         self.dc_size = self.c_size // self.d_ratio
 
+        self.RGB_transform_dataaug = transforms.Compose([
+            transforms.ToTensor(),
+            transforms.Normalize(
+                mean=[0.407, 0.389, 0.396],
+                std=[0.241, 0.246, 0.242]),
+        ])
+
         self.RGB_transform = transforms.Compose([
             transforms.ToTensor(),
             transforms.Normalize(
                 mean=[0.407, 0.389, 0.396],
                 std=[0.241, 0.246, 0.242]),
         ])
+
         self.T_transform = transforms.Compose([
             transforms.ToTensor(),
             transforms.Normalize(
                 mean=[0.492, 0.168, 0.430],
                 std=[0.317, 0.174, 0.191]),
         ])
+
 
     def __len__(self):
         return len(self.rgb_list)
@@ -148,8 +156,22 @@ class Crowd(data.Dataset):
         gt_discrete = gt_discrete.reshape([down_h, self.d_ratio, down_w, self.d_ratio]).sum(axis=(1, 3))
         gt_discrete = np.expand_dims(gt_discrete, 0)
 
-        RGB = self.RGB_transform(RGB)
+
+        # 随机水平翻转
+        if random.random() > 0.5:
+            RGB = np.fliplr(RGB).copy()
+            T = np.fliplr(T).copy()
+            gt_discrete = np.fliplr(gt_discrete).copy()
+            keypoints[:, 0] = w - keypoints[:, 0]  # 水平翻转关键点
+        
+        # 将 numpy 数组转换为 PIL 图像
+        RGB = Image.fromarray(RGB)
+        T = Image.fromarray(T)
+
+        RGB = self.RGB_transform_dataaug(RGB)
         T = self.T_transform(T)
+
+
         input = [RGB, T]
 
         return input, torch.from_numpy(keypoints.copy()).float(), torch.from_numpy(

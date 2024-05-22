@@ -10,9 +10,7 @@ import math
 parser = argparse.ArgumentParser(description='Test')
 parser.add_argument('--data-dir', default='F:/DataSets/RGBT_CC',
                         help='training data directory')
-parser.add_argument('--save-dir', default='./ckpts_PVTV2_r224/0727-104422',
-                        help='model directory')
-parser.add_argument('--model', default='best_model_10.762619034647942.pth'
+parser.add_argument('--model', default='./best_model_10.762619034647942.pth'
                     , help='model name')
 parser.add_argument('--img_size', default=224, type=int, help='network input size')
 parser.add_argument('--device', default='0', help='gpu device')
@@ -29,7 +27,7 @@ if __name__ == '__main__':
 
     model = ThermalRGBNet()
     model.to(device)
-    model_path = os.path.join(args.save_dir, args.model)
+    model_path = args.model
     checkpoint = torch.load(model_path, device)
     model.load_state_dict(checkpoint, strict=False)
     model.eval()
@@ -66,29 +64,7 @@ if __name__ == '__main__':
             name = int(name[0])
             epoch_res.append([name, f"{name},{formatted_ans}\n"])
 
-            # res = torch.sum(target).item() - torch.sum(outputs).item()
-            # epoch_res.append(res)
-
-            # for L in range(4):
-            #     abs_error, square_error = eval_game(outputs, target, L)
-            #     game[L] += abs_error
-            #     mse[L] += square_error
-            
-
     epoch_res.sort()
     with open('./ans.txt', 'w') as file:
         for result in epoch_res:
             file.writelines(result[1])
-    # N = len(dataloader)
-    # epoch_res = np.array(epoch_res)
-    # mse1 = np.sqrt(np.mean(np.square(epoch_res)))
-    # mae1 = np.mean(np.abs(epoch_res))
-    # print(mae1)
-    # game = [m / N for m in game]
-    # mse = [math.sqrt(m / N) for m in mse]
-    # total_relative_error = total_relative_error / N
-    # log_str = 'Test{}, GAME0 {game0:.2f} GAME1 {game1:.2f} GAME2 {game2:.2f} GAME3 {game3:.2f} ' \
-    #           'MSE {mse:.2f}  '. \
-    #     format(N, game0=game[0], game1=game[1], game2=game[2], game3=game[3], mse=mse[0])
-    # print(log_str)
-
