@@ -120,7 +120,7 @@ label_base_path = os.path.join(src_base_path, "labels/")
 i = 0
 for label_path in glob.glob(os.path.join(label_base_path, '*R.xml')):
     if skip_big:
-        index = int(os.path.basename(label_path).split('.')[0])
+        index = int(os.path.basename(label_path).split('R')[0])
         if index < 124 or (index > 200 and index < 411) or (index > 708 and index < 1389) or (index > 1733 and index < 2000):
             print(f"skip {index}")
             continue
