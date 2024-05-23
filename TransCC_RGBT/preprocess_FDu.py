@@ -23,6 +23,7 @@ def resizeJPG(image):
 print("start move jpgs")
 
 more_jpg = True
+skip_big = True
 
 options = ["train/", "test/"]
 option2 = ""
@@ -44,6 +45,13 @@ for option in options:
     i = 0
     for rgb_path in rgb_paths:
         print(f"{option}: {i}")
+        
+        if option == "train/" and skip_big:
+            index = int(os.path.basename(rgb_path).split('.')[0])
+            if index < 124 or (index > 200 and index < 411) or (index > 708 and index < 1389) or (index > 1733 and index < 2000):
+                print(f"skip {index}")
+                continue
+        
         Img_data = cv2.imread(rgb_path)
         
         tir_path = rgb_path.replace("rgb", "tir").replace(".jpg", "R.jpg")
@@ -111,6 +119,12 @@ label_base_path = os.path.join(src_base_path, "labels/")
 
 i = 0
 for label_path in glob.glob(os.path.join(label_base_path, '*R.xml')):
+    if skip_big:
+        index = int(os.path.basename(label_path).split('.')[0])
+        if index < 124 or (index > 200 and index < 411) or (index > 708 and index < 1389) or (index > 1733 and index < 2000):
+            print(f"skip {index}")
+            continue
+        
     json_path = os.path.join(dst_base_path, os.path.basename(label_path)).replace("R.xml", "_GT.json")
     rgb_path = json_path.replace("_GT.json", "_RGB.jpg")
     rgb_data = cv2.imread(rgb_path)
